@@ -8,7 +8,7 @@ description: >-
 
 {% embed url="https://www.mongodb.com/docs/manual/reference/operator/query/" %}
 
-## Authentication Bypass
+## # Authentication Bypass
 
 ```mongodb
 db.user.find({"uid": req.body.uid, "upw": req.body.upw })
@@ -38,7 +38,7 @@ Mongo : ' || 1==1//
       : ' || 1==1%00
 ```
 
-## Blind NoSQL Injection
+## # Blind NoSQL Injection
 
 ### Length Extraction
 
