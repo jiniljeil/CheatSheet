@@ -1,3 +1,3 @@
 # Table of contents
 
-* [MySQL](README.md)
+* [SSTI](README.md)
